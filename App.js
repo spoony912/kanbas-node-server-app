@@ -15,9 +15,9 @@ const CONNECTION_STRING = process.env.DB_CONNECTION_STRING || 'mongodb://127.0.0
 const DB_NAME = process.env.DB_NAME || 'Kanbas';
 mongoose.connect( CONNECTION_STRING, {dbName: DB_NAME});
 
-const branches = ["main", "a6"];
-const strippedNetlifyUrl = process.env.NETLIFY_URL.replace("https://", "")
-const allowedOrigins = [process.env.FRONTEND_URL, ...branches.map((branch) => `https://${branch}--${strippedNetlifyUrl}`)];
+// const branches = ["main", "a6"];
+// const strippedNetlifyUrl = process.env.NETLIFY_URL.replace("https://", "")
+// const allowedOrigins = [process.env.FRONTEND_URL, ...branches.map((branch) => `https://${branch}--${strippedNetlifyUrl}`)];
 
 const app = express();
 
@@ -30,19 +30,6 @@ const app = express();
 //   }
 // }));
 
-app.use(cors({
-    credentials: true,
-    // origin: [process.env.FRONTEND_URL, "http://localhost:3000"],
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
-    }
-    
-  }));
 
 const sessionOptions = {
   // secret:process.env.SESSION_SECRE,
@@ -62,6 +49,19 @@ if (process.env.NODE_ENV !=="development") {
 }
 app.use(session(sessionOptions));
 app.use(express.json());
+app.use(cors({
+  credentials: true,
+  origin: [process.env.FRONTEND_URL, "http://localhost:3000", "https://a6--friendly-rabanadas-e3c7fe.netlify.app"],
+  // origin: (origin, callback) => {
+  //   if (!origin || allowedOrigins.includes(origin)) {
+  //     return callback(null, true);
+  //   } else {
+  //     const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+  //     return callback(new Error(msg), false);
+  //   }
+  // }
+  
+}));
 UserRoutes(app);
 CourseRoutes(app);
 ModuleRoutes(app);
